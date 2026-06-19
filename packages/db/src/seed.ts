@@ -16,10 +16,10 @@ async function main() {
   const [org] = await db
     .insert(organizations)
     .values({
-      name: 'AWP Creative Accounting',
+      name: 'AWP Creative',
       slug: 'awp-creative',
-      email: 'hello@awpcreative.test',
-      brandColor: '#E8A33D',
+      email: 'hello@awpcreative.co',
+      brandColor: '#34302a',
       defaultCurrency: 'USD',
       defaultPaymentTerms: 30,
       plan: 'pro',

@@ -25,7 +25,7 @@ export function ReminderEmail({
   daysOverdue,
   payUrl,
   tone = 'friendly',
-  brandColor = '#E8A33D',
+  brandColor = '#34302a',
 }: ReminderEmailProps) {
   return (
     <Html>
@@ -54,13 +54,13 @@ export function ReminderEmail({
 
 export default ReminderEmail;
 
-const body = { backgroundColor: '#14110e', fontFamily: 'Helvetica, Arial, sans-serif' };
-const container = { margin: '0 auto', padding: '32px', maxWidth: '560px', backgroundColor: '#1c1814' };
+const body = { backgroundColor: '#ece5da', fontFamily: 'Helvetica, Arial, sans-serif' };
+const container = { margin: '0 auto', padding: '32px', maxWidth: '560px', backgroundColor: '#f4eee5' };
 const h1 = { fontSize: '24px', fontWeight: 700, margin: '0 0 16px' };
-const text = { color: '#e8e2d9', fontSize: '15px', lineHeight: '24px' };
-const muted = { color: '#9a9082', fontSize: '12px' };
+const text = { color: '#34302a', fontSize: '15px', lineHeight: '24px' };
+const muted = { color: '#847c6f', fontSize: '12px' };
 const button = {
-  color: '#14110e',
+  color: '#ece5da',
   fontWeight: 700,
   fontSize: '15px',
   padding: '12px 24px',

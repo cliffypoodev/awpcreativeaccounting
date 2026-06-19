@@ -30,7 +30,7 @@ export default function SignupPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
       <Link href="/" className="mb-8 font-display text-xl font-semibold">
-        Invoice<span className="text-[var(--color-amber)]">Forge</span>
+        AWP Creative
       </Link>
       <Card>
         <h1 className="font-display text-2xl font-semibold">Start free</h1>

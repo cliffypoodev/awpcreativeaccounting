@@ -5,12 +5,12 @@ const fmt = (n: number, c: string) =>
 
 /** Modern: sans-serif, bold amber accent band, generous whitespace. */
 export function ModernTemplate({ data }: { data: PdfInvoiceData }) {
-  const accent = data.brandColor ?? '#E8A33D';
+  const accent = data.brandColor ?? '#34302a';
   return (
     <div style={{ fontFamily: 'Helvetica, Arial, sans-serif', color: '#14110e', maxWidth: '720px' }}>
       <div style={{ background: accent, padding: '32px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <h1 style={{ margin: 0, fontSize: '26px', color: '#14110e' }}>{data.orgName}</h1>
-        <div style={{ textAlign: 'right' }}>
+        <h1 style={{ margin: 0, fontSize: '26px', color: '#ece5da' }}>{data.orgName}</h1>
+        <div style={{ textAlign: 'right', color: '#ece5da' }}>
           <div style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '3px' }}>Invoice</div>
           <div style={{ fontFamily: 'monospace', fontSize: '16px', fontWeight: 700 }}>{data.invoiceNumber}</div>
         </div>
@@ -56,7 +56,7 @@ export function ModernTemplate({ data }: { data: PdfInvoiceData }) {
             <Line label="Tax" value={fmt(data.taxAmount, data.currency)} />
             {data.discountAmount > 0 && <Line label="Discount" value={`− ${fmt(data.discountAmount, data.currency)}`} />}
             <div style={{ borderTop: '2px solid #14110e', marginTop: '8px', paddingTop: '8px' }}>
-              <Line label="Amount due" value={fmt(data.amountDue, data.currency)} big accent={accent} />
+              <Line label="Amount due" value={fmt(data.amountDue, data.currency)} big accent="#8a5a1c" />
             </div>
           </div>
         </section>

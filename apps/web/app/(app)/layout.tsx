@@ -19,7 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen">
       <aside className="hidden w-60 shrink-0 border-r border-[var(--color-border)] p-5 md:block">
         <Link href="/dashboard" className="font-display text-lg font-semibold">
-          Invoice<span className="text-[var(--color-amber)]">Forge</span>
+          AWP Creative
         </Link>
         <nav className="mt-8 space-y-1">
           {nav.map(([href, label]) => (

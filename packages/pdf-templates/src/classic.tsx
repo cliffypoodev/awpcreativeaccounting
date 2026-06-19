@@ -5,7 +5,7 @@ const fmt = (n: number, c: string) =>
 
 /** Classic: serif headings, ruled table, conservative. */
 export function ClassicTemplate({ data }: { data: PdfInvoiceData }) {
-  const accent = data.brandColor ?? '#1a1a1a';
+  const accent = data.brandColor ?? '#34302a';
   return (
     <div style={{ fontFamily: 'Georgia, serif', color: '#1a1a1a', padding: '48px', maxWidth: '720px' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `2px solid ${accent}`, paddingBottom: '16px' }}>

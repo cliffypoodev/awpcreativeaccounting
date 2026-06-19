@@ -25,7 +25,7 @@ export default function HomePage() {
     <main className="mx-auto max-w-6xl px-6">
       <nav className="flex items-center justify-between py-6">
         <span className="font-display text-xl font-semibold">
-          Invoice<span className="text-[var(--color-amber)]">Forge</span>
+          AWP Creative
         </span>
         <div className="flex items-center gap-3">
           <Link href="/pricing" className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]">Pricing</Link>
@@ -68,7 +68,7 @@ export default function HomePage() {
               <tr className="border-b border-[var(--color-border)] text-left text-[var(--color-ink-muted)]">
                 <th className="p-4 font-medium">Area</th>
                 <th className="p-4 font-medium">invoicer.ai</th>
-                <th className="p-4 font-medium text-[var(--color-amber)]">InvoiceForge</th>
+                <th className="p-4 font-medium text-[var(--color-amber)]">AWP Creative</th>
               </tr>
             </thead>
             <tbody>
@@ -85,7 +85,7 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-[var(--color-border)] py-10 text-sm text-[var(--color-ink-muted)]">
-        © {new Date().getFullYear()} InvoiceForge. Built on Next.js 15 · tRPC · Drizzle · FastAPI.
+        © {new Date().getFullYear()} AWP Creative®. All rights reserved.
       </footer>
     </main>
   );
