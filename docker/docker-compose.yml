@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: invoiceforge
+      POSTGRES_PASSWORD: invoiceforge
+      POSTGRES_DB: invoiceforge
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U invoiceforge']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # HTML -> PDF rendering for invoices (blueprint §8).
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    ports:
+      - '3001:3000'
+
+  # Local SMTP catcher so emails are viewable in dev without Resend.
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - '1025:1025' # SMTP
+      - '8025:8025' # web UI
+
+  ai-service:
+    build:
+      context: ../apps/ai-service
+      dockerfile: Dockerfile
+    environment:
+      WEB_ORIGIN: http://localhost:3000
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    ports:
+      - '8000:8000'
+
+volumes:
+  pgdata:

@@ -1,0 +1,39 @@
+{
+  "name": "@invoiceforge/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@invoiceforge/db": "workspace:*",
+    "@invoiceforge/shared": "workspace:*",
+    "@tanstack/react-query": "^5.59.0",
+    "@trpc/client": "^11.0.0-rc.553",
+    "@trpc/react-query": "^11.0.0-rc.553",
+    "@trpc/server": "^11.0.0-rc.553",
+    "better-auth": "^1.0.0",
+    "clsx": "^2.1.1",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "stripe": "^17.2.0",
+    "superjson": "^2.2.1",
+    "tailwind-merge": "^2.5.4",
+    "zod": "^3.23.8",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.7.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.3"
+  }
+}

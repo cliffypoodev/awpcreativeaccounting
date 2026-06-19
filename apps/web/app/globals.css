@@ -1,0 +1,33 @@
+@import 'tailwindcss';
+
+/* InvoiceForge design tokens — warm-dark, amber accent (anti-slop house style) */
+@theme {
+  --color-bg: #14110e;
+  --color-surface: #1c1813;
+  --color-surface-2: #241f18;
+  --color-border: #352d22;
+  --color-ink: #f4ede0;
+  --color-ink-muted: #b7ab97;
+  --color-amber: #e8a33d;
+  --color-amber-soft: #f0bd6d;
+  --color-success: #6fbf73;
+  --color-danger: #e2603f;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { border-color: var(--color-border); }
+
+html, body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display { font-family: var(--font-display); }
+.font-mono { font-family: var(--font-mono); }
+
+a { color: inherit; text-decoration: none; }
