@@ -8,10 +8,10 @@ import { Input } from '@/components/ui/input';
 
 export default function ClientsPage() {
   const utils = trpc.useUtils();
-  const clients = trpc.client.list.useQuery();
-  const create = trpc.client.create.useMutation({
+  const clients = trpc.clients.list.useQuery();
+  const create = trpc.clients.create.useMutation({
     onSuccess: () => {
-      utils.client.list.invalidate();
+      utils.clients.list.invalidate();
       setForm({ name: '', email: '', company: '', phone: '' });
       setOpen(false);
     },
