@@ -10,7 +10,7 @@ import {
   ROLES,
   PLAN_IDS,
   PDF_TEMPLATES,
-} from './constants.js';
+} from './constants';
 
 export const addressSchema = z.object({
   line1: z.string().max(255).optional(),
