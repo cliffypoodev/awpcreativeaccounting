@@ -35,7 +35,7 @@ const inDays = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString(
 
 export default function NewInvoicePage() {
   const router = useRouter();
-  const clients = trpc.client.list.useQuery();
+  const clients = trpc.clients.list.useQuery();
   const create = trpc.invoice.create.useMutation({
     onSuccess: (inv) => router.push('/invoices'),
   });
