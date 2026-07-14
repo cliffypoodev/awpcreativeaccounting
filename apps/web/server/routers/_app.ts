@@ -9,7 +9,7 @@ import { dashboardRouter } from './dashboard';
 /** Root tRPC router (blueprint §14). */
 export const appRouter = router({
   org: orgRouter,
-  client: clientRouter,
+  clients: clientRouter,
   invoice: invoiceRouter,
   estimate: estimateRouter,
   expense: expenseRouter,
