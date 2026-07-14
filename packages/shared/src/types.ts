@@ -1,5 +1,5 @@
 /** InvoiceForge — shared domain types (framework-agnostic). */
-import type { InvoiceStatus, EstimateStatus, Role, PlanId } from './constants.js';
+import type { InvoiceStatus, EstimateStatus, Role, PlanId } from './constants';
 
 export interface Money {
   amount: number;
