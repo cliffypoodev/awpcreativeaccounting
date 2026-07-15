@@ -1,0 +1,487 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Better Auth tables ────────────────────────────────────────────
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  orgs          Organization[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── Business domain (InvoiceForge / AWP Creative) ─────────────────
+model Organization {
+  id                  String   @id @default(cuid())
+  ownerId             String
+  owner               User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name                String
+  slug                String   @unique
+  email               String?
+  phone               String?
+  website             String?
+  taxId               String?
+  logoUrl             String?
+  brandColor          String   @default("#34302a")
+  defaultCurrency     String   @default("USD")
+  defaultTaxRate      Float    @default(0)
+  defaultPaymentTerms Int      @default(30)
+  defaultNotes        String?
+  defaultTerms        String?
+  invoiceSeq          Int      @default(0)
+  estimateSeq         Int      @default(0)
+  taxSetAsidePercent  Float    @default(25)
+  leadCaptureKey      String?  @unique
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  clients            Client[]
+  invoices           Invoice[]
+  estimates          Estimate[]
+  expenses           Expense[]
+  tags               Tag[]
+  projects           Project[]
+  recurringSchedules RecurringSchedule[]
+  projectCosts       ProjectCost[]
+  deliverables       Deliverable[]
+  leads              Lead[]
+  reviewRequests     ReviewRequest[]
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name      String
+  email     String?
+  phone     String?
+  company   String?
+  notes     String?
+  source    String?
+  status    String   @default("active")
+  // denormalized rollups
+  totalInvoiced    Float @default(0)
+  totalPaid        Float @default(0)
+  totalOutstanding Float @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoices           Invoice[]
+  estimates          Estimate[]
+  expenses           Expense[]
+  tagLinks           ClientTag[]
+  projects           Project[]
+  recurringSchedules RecurringSchedule[]
+
+  @@index([orgId])
+}
+
+model Invoice {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  clientId  String?
+  client    Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  projectId           String?
+  project             Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  milestoneType       String?
+  recurringScheduleId String?
+  recurringSchedule   RecurringSchedule? @relation(fields: [recurringScheduleId], references: [id], onDelete: SetNull)
+  number    String
+  status    String   @default("draft")
+  issueDate String   // ISO date (YYYY-MM-DD)
+  dueDate   String
+  currency  String   @default("USD")
+  subtotal       Float @default(0)
+  taxAmount      Float @default(0)
+  discountAmount Float @default(0)
+  depositsTotal  Float @default(0)
+  total          Float @default(0)
+  amountPaid     Float @default(0)
+  amountDue      Float @default(0)
+  notes     String?
+  terms     String?
+  fromEstimateId String?
+  sentAt    DateTime?
+  paidAt    DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items        InvoiceItem[]
+  discounts    InvoiceDiscount[]
+  deposits     InvoiceDeposit[]
+  tagLinks     InvoiceTag[]
+  deliverables Deliverable[]
+
+  @@unique([orgId, number])
+  @@index([orgId])
+  @@index([clientId])
+  @@index([status])
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Float   @default(1)
+  unitPrice   Float
+  amount      Float
+  taxRate     Float   @default(0)
+  unit        String?
+  sortOrder   Int     @default(0)
+}
+
+model InvoiceDiscount {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String?
+  type        String  // 'percentage' | 'fixed'
+  value       Float
+  amount      Float
+}
+
+model InvoiceDeposit {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String?
+  amount      Float
+  paidAt      DateTime?
+}
+
+model Estimate {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  clientId  String?
+  client    Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  number    String
+  status    String   @default("draft")
+  issueDate String
+  expiryDate String?
+  currency  String   @default("USD")
+  subtotal       Float @default(0)
+  taxAmount      Float @default(0)
+  discountAmount Float @default(0)
+  total          Float @default(0)
+  notes     String?
+  terms     String?
+  convertedInvoiceId String?
+  sentAt    DateTime?
+  approvedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items     EstimateItem[]
+  discounts EstimateDiscount[]
+  approval  EstimateApproval?
+
+  @@unique([orgId, number])
+  @@index([orgId])
+}
+
+model EstimateItem {
+  id          String   @id @default(cuid())
+  estimateId  String
+  estimate    Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Float    @default(1)
+  unitPrice   Float
+  amount      Float
+  taxRate     Float    @default(0)
+  unit        String?
+  sortOrder   Int      @default(0)
+}
+
+model EstimateDiscount {
+  id          String   @id @default(cuid())
+  estimateId  String
+  estimate    Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  description String?
+  type        String
+  value       Float
+  amount      Float
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  category    String?
+  vendor      String?
+  description String?
+  amount      Float
+  currency    String   @default("USD")
+  date        String   // ISO date
+  receiptUrl  String?
+  taxDeductible Boolean @default(false)
+  clientId    String?
+  client      Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+
+  @@index([orgId])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name      String
+  color     String   @default("#6b7280")
+  createdAt DateTime @default(now())
+
+  clientLinks      ClientTag[]
+  projectLinks     ProjectTag[]
+  invoiceLinks     InvoiceTag[]
+  deliverableLinks DeliverableTag[]
+
+  @@unique([orgId, name])
+  @@index([orgId])
+}
+
+model ClientTag {
+  clientId  String
+  client    Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  @@id([clientId, tagId])
+}
+
+model ProjectTag {
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  @@id([projectId, tagId])
+}
+
+model InvoiceTag {
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  @@id([invoiceId, tagId])
+}
+
+model Project {
+  id            String   @id @default(cuid())
+  orgId         String
+  org           Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  clientId      String?
+  client        Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  name          String
+  referenceCode String
+  serviceType   String
+  status        String   @default("lead")
+  description   String?
+  startDate     String?
+  endDate       String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tagLinks           ProjectTag[]
+  invoices           Invoice[]
+  estimates          Estimate[]
+  recurringSchedules RecurringSchedule[]
+  costs              ProjectCost[]
+  deliverables       Deliverable[]
+  reviewRequests     ReviewRequest[]
+
+  @@index([orgId])
+  @@index([clientId])
+}
+
+model ProjectCost {
+  id          String   @id @default(cuid())
+  orgId       String
+  projectId   String
+  category    String
+  description String?
+  amount      Float
+  currency    String   @default("USD")
+  date        String
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([projectId])
+}
+
+// ─── Phase 4: Asset / deliverable catalog ──────────────────────────
+model Deliverable {
+  id          String   @id @default(cuid())
+  orgId       String
+  projectId   String
+  invoiceId   String?
+  name        String
+  assetType   String
+  status      String   @default("draft")
+  fileUrl     String?
+  fileFormat  String?
+  fileSize    String?
+  version     Int      @default(1)
+  deliveredAt String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org      Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project  Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  invoice  Invoice?         @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  tagLinks DeliverableTag[]
+
+  @@index([orgId])
+  @@index([projectId])
+  @@index([invoiceId])
+}
+
+model DeliverableTag {
+  deliverableId String
+  deliverable   Deliverable @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
+  tagId         String
+  tag           Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  @@id([deliverableId, tagId])
+}
+
+model RecurringSchedule {
+  id           String   @id @default(cuid())
+  orgId        String
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  clientId     String?
+  client       Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  projectId    String?
+  project      Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  name         String
+  status       String   @default("active")
+  frequency    String   @default("monthly")
+  nextDate     String
+  endDate      String?
+  currency     String   @default("USD")
+  totalPrepaid Int      @default(0)
+  unitsUsed    Int      @default(0)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  items    RecurringItem[]
+  invoices Invoice[]
+
+  @@index([orgId])
+}
+
+model RecurringItem {
+  id          String            @id @default(cuid())
+  scheduleId  String
+  schedule    RecurringSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Float   @default(1)
+  unitPrice   Float
+  taxRate     Float   @default(0)
+  sortOrder   Int     @default(0)
+}
+
+model EstimateApproval {
+  id          String   @id @default(cuid())
+  estimateId  String   @unique
+  estimate    Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  signerName  String
+  signerEmail String
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+}
+
+// ─── Phase 5: Marketing & retention ────────────────────────────────
+model Lead {
+  id                String   @id @default(cuid())
+  orgId             String
+  org               Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name              String
+  email             String?
+  phone             String?
+  company           String?
+  message           String?
+  source            String?
+  serviceType       String?
+  stage             String   @default("new")
+  convertedClientId String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([stage])
+}
+
+model ReviewRequest {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientId  String?
+  clientName  String?
+  clientEmail String?
+  message   String?
+  createdAt DateTime @default(now())
+
+  @@index([orgId])
+  @@index([projectId])
+}

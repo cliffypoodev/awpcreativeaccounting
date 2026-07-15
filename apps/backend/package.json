@@ -1,0 +1,34 @@
+{
+  "name": "backend",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node --import tsx src/index.ts",
+    "studio": "prisma studio --port 3001 --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "prisma:generate": "prisma generate"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "prisma": "6",
+    "tsx": "^4.19.2",
+    "typescript": "5.8.3",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.14",
+    "@hono/zod-validator": "^0.8.0",
+    "@prisma/client": "6",
+    "better-auth": "^1.6.19",
+    "hono": "^4.10.0",
+    "unpdf": "^1.6.2",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "zod": "4.1.11"
+  }
+}
