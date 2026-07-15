@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, desc } from 'drizzle-orm';
-import { db, expenses } from '@invoiceforge/db';
+import { and, db, desc, eq, expenses } from '@invoiceforge/db';
 import { expenseInput } from '@invoiceforge/shared';
 import { router, protectedProcedure } from '../trpc';
 
@@ -26,8 +25,10 @@ export const expenseRouter = router({
       .returning();
     return row;
   }),
-  delete: protectedProcedure.input(z.string().uuid()).mutation(async ({ input }) => {
-    await db.delete(expenses).where(eq(expenses.id, input));
+  delete: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
+    await db
+      .delete(expenses)
+      .where(and(eq(expenses.id, input), eq(expenses.orgId, ctx.user.orgId)));
     return { ok: true };
   }),
 });
