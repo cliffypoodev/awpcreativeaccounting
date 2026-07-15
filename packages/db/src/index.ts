@@ -13,5 +13,6 @@ const client = globalForDb.__ifClient ?? postgres(connectionString, { max: 10 })
 if (process.env.NODE_ENV !== 'production') globalForDb.__ifClient = client;
 
 export const db = drizzle(client, { schema });
+export { and, desc, eq, ilike, sql } from 'drizzle-orm';
 export { schema };
 export * from './schema';
