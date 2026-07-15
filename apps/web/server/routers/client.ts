@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { and, eq, desc, ilike } from 'drizzle-orm';
-import { db, clients } from '@invoiceforge/db';
+import { and, clients, db, desc, eq, ilike } from '@invoiceforge/db';
 import { clientInput } from '@invoiceforge/shared';
 import { router, protectedProcedure } from '../trpc';
 
