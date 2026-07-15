@@ -59,7 +59,6 @@ export function AiImportDialog({ open, onOpenChange, onDraft }: Props) {
       const baseUrl = import.meta.env.VITE_BACKEND_URL || "";
       const res = await fetch(`${baseUrl}/api/ai/invoice-from-file`, {
         method: "POST",
-        credentials: "include",
         body: fd,
       });
       const json = await res.json().catch(() => null);

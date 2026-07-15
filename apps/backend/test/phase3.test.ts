@@ -1,10 +1,9 @@
 /**
  * Phase 3 — profitability, project costs, tax set-aside, cash flow
  *
- * Better Auth HMAC-signs session cookies, so raw tokens can't be inserted
- * directly into the DB for tests. Instead, we build a minimal test Hono app
- * that mounts the same routes but uses an injected auth middleware that
- * short-circuits to a known user — no cookie signing required.
+ * We build a minimal test Hono app that mounts the same routes and injects a
+ * known single user. This also makes it possible to verify workspace isolation
+ * using a second test owner.
  *
  * Cross-workspace isolation is verified by switching the injected user
  * between two separate test organizations.
@@ -25,7 +24,7 @@ const ORG_B = { userId: "p3-test-user-b", orgId: "p3-test-org-b" };
 
 // ─── Minimal test-app factory ─────────────────────────────────────
 /**
- * Build a Hono app that skips real Better Auth and injects a user directly.
+ * Build a Hono app that injects a user directly.
  * The injected userId must match an existing Organization.ownerId in the DB.
  */
 function makeTestApp(userId: string | null) {
@@ -45,7 +44,6 @@ function makeTestApp(userId: string | null) {
     } else {
       c.set("user", null);
     }
-    c.set("session", null as any);
     await next();
   });
 

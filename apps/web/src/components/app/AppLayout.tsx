@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
@@ -7,7 +7,6 @@ import {
   Users,
   Receipt,
   Settings,
-  LogOut,
   Menu,
   Plus,
   FolderOpen,
@@ -20,7 +19,6 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/lib/auth-client";
 import { useMe } from "@/lib/queries";
 
 const NAV = [
@@ -40,12 +38,6 @@ const NAV = [
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const { data: me } = useMe();
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/login");
-  };
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
@@ -92,16 +84,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="border-t border-sidebar-border p-3">
-        <div className="mb-2 px-2">
+        <div className="px-2 py-1">
           <p className="truncate text-sm font-medium">{me?.user.name ?? "—"}</p>
-          <p className="truncate text-xs text-sidebar-foreground/60">{me?.user.email ?? ""}</p>
+          <p className="truncate text-xs text-sidebar-foreground/60">Private single-user workspace</p>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
-        >
-          <LogOut className="h-4 w-4" /> Sign out
-        </button>
       </div>
     </div>
   );

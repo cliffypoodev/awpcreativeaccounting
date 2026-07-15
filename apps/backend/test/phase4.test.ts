@@ -1,10 +1,9 @@
 /**
  * Phase 4 — deliverable catalog, naming scheme, auto-tags, receipt inbox.
  *
- * Same mock-auth test harness as phase3: Better Auth HMAC-signs session
- * cookies, so we mount the real routers behind a middleware that injects a
- * known user directly. Cross-workspace isolation is verified by switching the
- * injected user between two separate organizations.
+ * Same single-user test harness as phase3: we mount the real routers behind a
+ * middleware that injects a known owner. Cross-workspace isolation is verified
+ * by switching the injected user between two separate organizations.
  */
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { Hono } from "hono";
@@ -36,7 +35,6 @@ function makeTestApp(userId: string | null) {
     } else {
       c.set("user", null);
     }
-    c.set("session", null as any);
     await next();
   });
 

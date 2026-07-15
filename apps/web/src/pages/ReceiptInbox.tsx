@@ -93,7 +93,6 @@ export default function ReceiptInbox() {
       const baseUrl = import.meta.env.VITE_BACKEND_URL || "";
       const res = await fetch(`${baseUrl}/api/ai/receipt-from-file`, {
         method: "POST",
-        credentials: "include",
         body: fd,
       });
       const json = await res.json().catch(() => null);

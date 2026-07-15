@@ -6,9 +6,6 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Login from "./pages/Login";
-import VerifyOtp from "./pages/VerifyOtp";
-import { ProtectedRoute, GuestRoute } from "./components/ProtectedRoute";
 import AppLayout from "./components/app/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
@@ -46,32 +43,11 @@ const App = () => (
       <HashRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route
-            path="/login"
-            element={
-              <GuestRoute>
-                <Login />
-              </GuestRoute>
-            }
-          />
-          <Route
-            path="/verify-otp"
-            element={
-              <GuestRoute>
-                <VerifyOtp />
-              </GuestRoute>
-            }
-          />
+          <Route path="/login" element={<Index />} />
+          <Route path="/verify-otp" element={<Index />} />
 
-          {/* Authenticated app */}
-          <Route
-            path="/app"
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
+          {/* Private single-user workspace */}
+          <Route path="/app" element={<AppLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="invoices" element={<Invoices />} />
             <Route path="invoices/new" element={<InvoiceEditorPage />} />

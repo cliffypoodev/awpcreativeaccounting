@@ -1,8 +1,8 @@
 import type { Context } from "hono";
 import { z } from "zod";
 import { randomBytes } from "node:crypto";
+import type { User } from "@prisma/client";
 import { prisma } from "../prisma";
-import type { auth } from "../auth";
 
 /** Parse + validate a JSON body against a Zod schema (throws ZodError → 400 via onError). */
 export async function body<S extends z.ZodTypeAny>(
@@ -13,12 +13,11 @@ export async function body<S extends z.ZodTypeAny>(
   return schema.parse(json);
 }
 
-type SessionUser = typeof auth.$Infer.Session.user;
+type SessionUser = User;
 
 export type AppContext = {
   Variables: {
     user: SessionUser | null;
-    session: typeof auth.$Infer.Session.session | null;
   };
 };
 

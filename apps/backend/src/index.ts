@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 import { env } from "./env";
 import { logger } from "hono/logger";
 import { ZodError } from "zod";
-import { auth } from "./auth";
+import { getSingleUser } from "./single-user";
 import type { AppContext } from "./lib/context";
 import { orgRouter } from "./routes/org";
 import { clientsRouter } from "./routes/clients";
@@ -38,24 +38,22 @@ app.use(
       origin && (origin === env.FRONTEND_URL || allowed.some((re) => re.test(origin)))
         ? origin
         : null,
-    credentials: true,
   })
 );
 
 app.use("*", logger());
 
-// Auth middleware — populates user/session for all routes
+// Single-user middleware. Network access is the security boundary: this API
+// binds to localhost by default and should only be published through a private,
+// access-controlled tunnel or reverse proxy.
 app.use("*", async (c, next) => {
-  if (c.req.path === "/health" || c.req.path.startsWith("/api/auth/")) {
+  if (c.req.path === "/health") {
     c.set("user", null);
-    c.set("session", null);
     await next();
     return;
   }
 
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-  c.set("user", session?.user ?? null);
-  c.set("session", session?.session ?? null);
+  c.set("user", await getSingleUser());
   await next();
 });
 
@@ -76,10 +74,7 @@ app.onError((err, c) => {
 // Health check
 app.get("/health", (c) => c.json({ status: "ok" }));
 
-// Better Auth handler
-app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-
-// App routes (all org-scoped, require auth)
+// App routes (all org-scoped to the configured single owner)
 app.route("/api/me", meRouter);
 app.route("/api/org", orgRouter);
 app.route("/api/clients", clientsRouter);
@@ -99,8 +94,8 @@ app.route("/api/costs", costsRouter);
 const port = Number(env.PORT);
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  serve({ fetch: app.fetch, port }, () => {
-    console.info(`AWP Accounting API listening on http://localhost:${port}`);
+  serve({ fetch: app.fetch, port, hostname: env.HOST }, () => {
+    console.info(`AWP Accounting API listening on http://${env.HOST}:${port}`);
   });
 }
 

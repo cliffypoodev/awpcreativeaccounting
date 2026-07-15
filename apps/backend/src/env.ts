@@ -7,15 +7,13 @@ import { z } from "zod";
 const envSchema = z.object({
   // Server Configuration
   PORT: z.string().optional().default("3000"),
+  HOST: z.string().optional().default("127.0.0.1"),
   NODE_ENV: z.string().optional(),
-  // Database + Auth
+  // Database + single owner identity
   DATABASE_URL: z.string().default("file:./dev.db"),
-  BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
-  BACKEND_URL: z.string().optional().default("http://localhost:3000"),
   FRONTEND_URL: z.string().url().optional(),
-  ALLOWED_EMAILS: z.string().min(1, "ALLOWED_EMAILS is required"),
-  RESEND_API_KEY: z.string().optional(),
-  AUTH_FROM_EMAIL: z.string().optional(),
+  SINGLE_USER_NAME: z.string().min(1).optional().default("AWP Owner"),
+  SINGLE_USER_EMAIL: z.string().email().optional().default("owner@example.invalid"),
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_BASE_URL: z.string().url().optional(),
   OPENAI_MODEL: z.string().optional().default("gpt-5.2"),

@@ -21,7 +21,6 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       "Content-Type": "application/json",
       ...options.headers,
     },
-    credentials: "include",
   };
 
   const response = await fetch(url, config);
@@ -60,7 +59,6 @@ async function rawRequest(endpoint: string, options: RequestInit = {}): Promise<
     headers: {
       ...options.headers,
     },
-    credentials: "include",
   };
   return fetch(url, config);
 }
