@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
-import { db, users, organizations } from '@invoiceforge/db';
+import { db, eq, users, organizations } from '@invoiceforge/db';
 import { signupInput, loginInput, type Role } from '@invoiceforge/shared';
 import {
   hashPassword,
